@@ -1,13 +1,13 @@
 package com.terminalBuffer;
 
-public class CellAtributes {
+public class CellAttributes {
     private TerminalColor foreground;
     private TerminalColor background;
     private boolean bold;
     private boolean italic;
     private boolean underline;
 
-    public CellAtributes() {
+    public CellAttributes() {
         this.foreground = TerminalColor.DEFAULT;
         this.background = TerminalColor.DEFAULT;
         this.bold = false;
@@ -15,7 +15,7 @@ public class CellAtributes {
         this.underline = false;
     }
 
-    public CellAtributes(TerminalColor foreground, TerminalColor background, boolean bold, boolean italic, boolean underline) {
+    public CellAttributes(TerminalColor foreground, TerminalColor background, boolean bold, boolean italic, boolean underline) {
         this.foreground = foreground;
         this.background = background;
         this.bold = bold;
@@ -23,8 +23,8 @@ public class CellAtributes {
         this.underline = underline;
     }
 
-    public CellAtributes copy(){
-        return new CellAtributes(foreground, background, bold, italic, underline);
+    public CellAttributes copy(){
+        return new CellAttributes(foreground, background, bold, italic, underline);
     }
 
     public TerminalColor getForeground() {
