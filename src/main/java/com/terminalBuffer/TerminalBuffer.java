@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TerminalBuffer {
-    private final int width;
+    private int width;
     private int height;
     private final int maxScrollbackSize;
 
@@ -50,6 +50,55 @@ public class TerminalBuffer {
         // Clamp to screen bounds so cursor never ends up outside the grid
         this.cursorRow = Math.max(0, Math.min(row, height - 1));
         this.cursorColumn = Math.max(0, Math.min(column, width - 1));
+    }
+
+    public void resize(int newWidth, int newHeight) {
+        if (newWidth <= 0 || newHeight <= 0) return;
+
+        for (int i = 0; i < screen.size(); i++) {
+            screen.set(i, resizeLine(screen.get(i), newWidth));
+        }
+
+        while (screen.size() < newHeight) {
+            TerminalCell[] line = new TerminalCell[newWidth];
+            for (int j = 0; j < newWidth; j++) {
+                line[j] = new TerminalCell();
+            }
+            screen.add(line);
+        }
+
+        // if screen got shorter, extra lines go to scrollback
+        while (screen.size() > newHeight) {
+            TerminalCell[] removed = screen.remove(0);
+            scrollback.add(removed);
+            if (scrollback.size() > maxScrollbackSize) {
+                scrollback.remove(0);
+            }
+        }
+
+        for (int i = 0; i < scrollback.size(); i++) {
+            scrollback.set(i, resizeLine(scrollback.get(i), newWidth));
+        }
+
+        this.width = newWidth;
+        this.height = newHeight;
+
+        cursorRow = Math.min(cursorRow, newHeight - 1);
+        cursorColumn = Math.min(cursorColumn, newWidth - 1);
+    }
+
+    private TerminalCell[] resizeLine(TerminalCell[] oldLine, int newWidth) {
+        TerminalCell[] newLine = new TerminalCell[newWidth];
+        int copyLen = Math.min(oldLine.length, newWidth);
+
+        for (int i = 0; i < copyLen; i++) {
+            newLine[i] = oldLine[i];
+        }
+        for (int i = copyLen; i < newWidth; i++) {
+            newLine[i] = new TerminalCell();
+        }
+
+        return newLine;
     }
 
     public void moveCursorUp(int n) {
