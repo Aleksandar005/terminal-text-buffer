@@ -196,4 +196,95 @@ public class TerminalBuffer {
     public void insertEmptyLineAtBottom() {
         scrollUp();
     }
+
+    public void clearScreen() {
+        for (int i = 0; i < height; i++) {
+            screen.set(i, createEmptyLine());
+        }
+        cursorRow = 0;
+        cursorColumn = 0;
+    }
+
+    public void clearScreenAndScrollback() {
+        clearScreen();
+        scrollback.clear();
+    }
+
+    public char getCharAt(int row, int column) {
+        return getCellAt(row, column).getCharacter();
+    }
+
+
+    public CellAttributes getAttributesAt(int row, int column) {
+        return getCellAt(row, column).getAttributes();
+    }
+
+    // Row index that works across both scrollback and screen.
+    // Rows 0..scrollback.size()-1 are scrollback, the rest are screen.
+    private TerminalCell getCellAt(int row, int column) {
+        if (column < 0 || column >= width) {
+            throw new IndexOutOfBoundsException("Column " + column + " out of bounds");
+        }
+
+        int scrollbackSize = scrollback.size();
+
+        if (row >= 0 && row < scrollbackSize) {
+            return scrollback.get(row)[column];
+        }
+
+        int screenRow = row - scrollbackSize;
+        if (screenRow >= 0 && screenRow < height) {
+            return screen.get(screenRow)[column];
+        }
+
+        throw new IndexOutOfBoundsException("Row " + row + " out of bounds");
+    }
+
+    public String getLineAsString(int row) {
+        int scrollbackSize = scrollback.size();
+
+        TerminalCell[] line;
+        if (row >= 0 && row < scrollbackSize) {
+            line = scrollback.get(row);
+        } else {
+            int screenRow = row - scrollbackSize;
+            if (screenRow < 0 || screenRow >= height) {
+                throw new IndexOutOfBoundsException("Row " + row + " out of bounds");
+            }
+            line = screen.get(screenRow);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (TerminalCell cell : line) {
+            sb.append(cell.getCharacter());
+        }
+        return sb.toString();
+    }
+
+    public String getScreenAsString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < height; i++) {
+            for (TerminalCell cell : screen.get(i)) {
+                sb.append(cell.getCharacter());
+            }
+            if (i < height - 1) {
+                sb.append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    public String getFullContentAsString() {
+        StringBuilder sb = new StringBuilder();
+
+        for (TerminalCell[] line : scrollback) {
+            for (TerminalCell cell : line) {
+                sb.append(cell.getCharacter());
+            }
+            sb.append('\n');
+        }
+
+        sb.append(getScreenAsString());
+        return sb.toString();
+    }
 }
