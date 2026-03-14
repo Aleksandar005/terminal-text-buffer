@@ -116,21 +116,60 @@ public class TerminalBuffer {
         currentAttributes.setUnderline(false);
     }
 
-    public void writeText(String text){
-        for(char c : text.toCharArray()){
-            if(cursorColumn >= width){
-                // Go to the next line if we hit the edge
+    public void writeText(String text) {
+        for (char c : text.toCharArray()) {
+            boolean wide = isWideChar(c);
+
+            if (wide && cursorColumn >= width - 1) {
+                // Wide char needs 2 cells but we only have 1 left on this line
+                // Fill the last cell with a space and wrap
+                screen.get(cursorRow)[cursorColumn] = new TerminalCell();
+                cursorColumn = 0;
+                cursorRow++;
+            } else if (cursorColumn >= width) {
                 cursorColumn = 0;
                 cursorRow++;
             }
-            if(cursorRow >= height){
+
+            if (cursorRow >= height) {
                 scrollUp();
                 cursorRow = height - 1;
             }
 
-            screen.get(cursorRow)[cursorColumn] = new TerminalCell(c, currentAttributes);
+            TerminalCell cell = new TerminalCell(c, currentAttributes);
+            if (wide) {
+                cell.setWideChar(true);
+            }
+            screen.get(cursorRow)[cursorColumn] = cell;
             cursorColumn++;
+
+            if (wide) {
+                // Place a continuation cell right after the wide char
+                if (cursorColumn >= width) {
+                    cursorColumn = 0;
+                    cursorRow++;
+                    if (cursorRow >= height) {
+                        scrollUp();
+                        cursorRow = height - 1;
+                    }
+                }
+                TerminalCell cont = new TerminalCell(' ', currentAttributes);
+                cont.setContinuationOfWideChar(true);
+                screen.get(cursorRow)[cursorColumn] = cont;
+                cursorColumn++;
+            }
         }
+    }
+
+    // Checks if a character takes up 2 cells (CJK, fullwidth forms, etc.)
+    private boolean isWideChar(char c) {
+        return (c >= 0x1100 && c <= 0x115F)        // Hangul Jamo
+                || (c >= 0x2E80 && c <= 0x9FFF)    // CJK radicals, ideographs, etc.
+                || (c >= 0xAC00 && c <= 0xD7AF)    // Hangul syllables
+                || (c >= 0xF900 && c <= 0xFAFF)    // CJK compatibility ideographs
+                || (c >= 0xFE10 && c <= 0xFE6F)    // CJK compatibility forms
+                || (c >= 0xFF01 && c <= 0xFF60)    // Fullwidth forms
+                || (c >= 0xFFE0 && c <= 0xFFE6);   // Fullwidth signs
     }
 
     private void scrollUp(){
@@ -256,7 +295,9 @@ public class TerminalBuffer {
 
         StringBuilder sb = new StringBuilder();
         for (TerminalCell cell : line) {
-            sb.append(cell.getCharacter());
+            if (!cell.isContinuationOfWideChar()) {
+                sb.append(cell.getCharacter());
+            }
         }
         return sb.toString();
     }

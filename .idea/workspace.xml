@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="cbd09f58-03fe-4858-b630-2d15ee943ee4" name="Changes" comment="">
       <change beforePath="E:/terminal-text-buffer/.idea/workspace.xml" beforeDir="false" afterPath="E:/terminal-text-buffer/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="E:/terminal-text-buffer/src/main/java/com/terminalBuffer/TerminalBuffer.java" beforeDir="false" afterPath="E:/terminal-text-buffer/src/main/java/com/terminalBuffer/TerminalBuffer.java" afterDir="false" />
+      <change beforePath="E:/terminal-text-buffer/src/main/java/com/terminalBuffer/TerminalCell.java" beforeDir="false" afterPath="E:/terminal-text-buffer/src/main/java/com/terminalBuffer/TerminalCell.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
