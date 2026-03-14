@@ -46,6 +46,28 @@ public class TerminalBuffer {
         return line;
     }
 
+    public void setCursorPosition(int row, int column) {
+        // Clamp to screen bounds so cursor never ends up outside the grid
+        this.cursorRow = Math.max(0, Math.min(row, height - 1));
+        this.cursorColumn = Math.max(0, Math.min(column, width - 1));
+    }
+
+    public void moveCursorUp(int n) {
+        cursorRow = Math.max(0, cursorRow - n);
+    }
+
+    public void moveCursorDown(int n) {
+        cursorRow = Math.min(height - 1, cursorRow + n);
+    }
+
+    public void moveCursorLeft(int n) {
+        cursorColumn = Math.max(0, cursorColumn - n);
+    }
+
+    public void moveCursorRight(int n) {
+        cursorColumn = Math.min(width - 1, cursorColumn + n);
+    }
+
     public int getWidth() {
         return width;
     }
