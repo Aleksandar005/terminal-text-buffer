@@ -144,4 +144,13 @@ public class TerminalBuffer {
 
         screen.add(createEmptyLine());
     }
+
+    public TerminalCell getScreenCell(int row, int column) {
+        if (row < 0 || row >= height || column < 0 || column >= width) {
+            throw new IndexOutOfBoundsException(
+                    "Position (" + row + ", " + column + ") is out of screen bounds"
+            );
+        }
+        return screen.get(row)[column];
+    }
 }
