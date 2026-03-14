@@ -153,4 +153,47 @@ public class TerminalBuffer {
         }
         return screen.get(row)[column];
     }
+
+    public void insertText(String text){
+        TerminalCell[] line = screen.get(cursorRow);
+
+        for (char c : text.toCharArray()) {
+            if (cursorColumn >= width) {
+                cursorColumn = 0;
+                cursorRow++;
+
+                if (cursorRow >= height) {
+                    scrollUp();
+                    cursorRow = height - 1;
+                }
+                line = screen.get(cursorRow);
+            }
+
+            // Shift existing cells to the right to make room
+            for (int i = width - 1; i > cursorColumn; i--) {
+                line[i] = line[i - 1];
+            }
+
+            line[cursorColumn] = new TerminalCell(c, currentAttributes);
+            cursorColumn++;
+        }
+    }
+
+    public void fillLine(int row, char c) {
+        if (row < 0 || row >= height) return;
+
+        TerminalCell[] line = screen.get(row);
+        for (int i = 0; i < width; i++) {
+            line[i] = new TerminalCell(c, currentAttributes);
+        }
+    }
+
+    public void fillLineEmpty(int row) {
+        if (row < 0 || row >= height) return;
+        screen.set(row, createEmptyLine());
+    }
+
+    public void insertEmptyLineAtBottom() {
+        scrollUp();
+    }
 }

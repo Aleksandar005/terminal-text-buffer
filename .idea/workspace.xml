@@ -39,6 +39,9 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Gradle.TerminalBufferCursorTest.moveCursorRightStopsAtEdge.executor": "Run",
+    "Gradle.TerminalBufferWriteText.writeAppliesCurrentAttributes.executor": "Run",
+    "Gradle.Tests in 'terminal-text-buffer.test'.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
