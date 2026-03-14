@@ -87,4 +87,61 @@ public class TerminalBuffer {
     public CellAttributes getCurrentAttributes() {
         return currentAttributes;
     }
+
+    public void setForegroundColor(TerminalColor color) {
+        currentAttributes.setForeground(color);
+    }
+
+    public void setBackgroundColor(TerminalColor color) {
+        currentAttributes.setBackground(color);
+    }
+
+    public void setBold(boolean bold) {
+        currentAttributes.setBold(bold);
+    }
+
+    public void setItalic(boolean italic) {
+        currentAttributes.setItalic(italic);
+    }
+
+    public void setUnderline(boolean underline) {
+        currentAttributes.setUnderline(underline);
+    }
+
+    public void resetAttributes() {
+        currentAttributes.setForeground(TerminalColor.DEFAULT);
+        currentAttributes.setBackground(TerminalColor.DEFAULT);
+        currentAttributes.setBold(false);
+        currentAttributes.setItalic(false);
+        currentAttributes.setUnderline(false);
+    }
+
+    public void writeText(String text){
+        for(char c : text.toCharArray()){
+            if(cursorColumn >= width){
+                // Go to the next line if we hit the edge
+                cursorColumn = 0;
+                cursorRow++;
+            }
+            if(cursorRow >= height){
+                scrollUp();
+                cursorRow = height - 1;
+            }
+
+            screen.get(cursorRow)[cursorColumn] = new TerminalCell(c, currentAttributes);
+            cursorColumn++;
+        }
+    }
+
+    private void scrollUp(){
+        TerminalCell[] topLine = screen.remove(0);
+        scrollback.add(topLine);
+
+        // Don't let scrollback grow forever
+        if (scrollback.size() > maxScrollbackSize) {
+            scrollback.remove(0);
+        }
+
+        screen.add(createEmptyLine());
+    }
 }
